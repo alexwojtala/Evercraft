@@ -3,12 +3,24 @@ class Character
     attr_accessor :armor
     attr_accessor :hitpoints
     attr_accessor :strength_modifier
+    attr_accessor :armor_modifier
+    attr_accessor :hitpoints_modifier
 
+    def self.with_strength(name, alignment, strength)
+        new(name, alignment, 5, strength)
+    end
+
+    def self.with_dexterity(name, alignment, dexterity)
+        new(name, alignment, 5, 10, dexterity)
+    end
+
+    def self.with_constitution(name, alignment, constitution)
+        new(name, alignment, 5, 10, 10, constitution)
+    end
+    
     def initialize(name, alignment, hitpoints = 5, strength = 10, dexterity = 10, constitution = 10, wisdom = 10, intelligence = 10, charisma = 10) 
         @name = name
         @alignment = alignment
-        @armor = 10
-        @hitpoints = hitpoints
         @strength = strength
         @dexterity = dexterity
         @constitution = constitution
@@ -16,6 +28,13 @@ class Character
         @intelligence = intelligence
         @charisma = charisma
         @strength_modifier = (@strength - 10)/2
+        @armor_modifier = (@dexterity - 10)/2
+        @armor = 10 + @armor_modifier
+        @hitpoints_modifier = (@constitution - 10)/2
+        @hitpoints = hitpoints + @hitpoints_modifier
+        if @hitpoints < 1 
+            @hitpoints = 1
+        end
     end
     def describe_character
         puts "Hi, I am #{@name}, a character with #{@alignment} alignment. I have #{@armor} armor and #{@hitpoints} hit points."
