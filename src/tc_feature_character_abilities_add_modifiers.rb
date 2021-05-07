@@ -3,57 +3,57 @@ require "test/unit"
  
 class TestCharacter < Test::Unit::TestCase
 
-  def test_character_higher_strength_increases_attack_roll_and_damage
+  def test_character_with_12_strength_increases_attack_roll_and_damage_by_1
     testAttacker = Character.with_strength("Bob", "Good", 12)
     testAttackee = Character.new("Ron", "Neutral")
     assert_equal(1, testAttacker.strength_modifier)
     assert_equal("Hit", testAttacker.attack(testAttackee, 9))
-    assert_equal(3, testAttackee.hitpoints)
+    assert_equal(3, testAttackee.hitpoints_remaining)
     assert_equal("Miss", testAttacker.attack(testAttackee, 8))
   end
 
-  def test_character_even_higher_strength_increases_attack_roll_and_damage_even_more
+  def test_character_with_15_strength_increases_attack_roll_and_damage_by_2
     testAttacker = Character.with_strength("Bob", "Good", 15)
-    testAttackee = Character.new("Ron", "Neutral", 5)
+    testAttackee = Character.new("Ron", "Neutral")
     assert_equal(2, testAttacker.strength_modifier)
     assert_equal("Hit", testAttacker.attack(testAttackee, 8))
-    assert_equal(2, testAttackee.hitpoints)
+    assert_equal(2, testAttackee.hitpoints_remaining)
     assert_equal("Miss", testAttacker.attack(testAttackee, 7))
   end
 
-  def test_character_lower_than_base_strength_of_10_decreases_attack_roll_and_damage
+  def test_character_with_8_strength_decreases_attack_roll_by_1_attack_damage_is_still_1
     testAttacker = Character.with_strength("Bob", "Good", 8)
     testAttackee = Character.new("Ron", "Neutral")
     assert_equal(-1, testAttacker.strength_modifier)
     assert_equal("Hit", testAttacker.attack(testAttackee, 11))
-    assert_equal(4, testAttackee.hitpoints)
+    assert_equal(4, testAttackee.hitpoints_remaining)
     assert_equal("Miss", testAttacker.attack(testAttackee, 10))
   end
 
-  def test_character_even_lower_than_base_strength_of_10_decreases_attack_roll_and_damage_even_more
+  def test_character__with_5_strength_decreases_attack_roll_by_3_attack_damage_is_still_1
     testAttacker = Character.with_strength("Bob", "Good", 5)
     testAttackee = Character.new("Ron", "Neutral")
     assert_equal(-3, testAttacker.strength_modifier)
     assert_equal("Hit", testAttacker.attack(testAttackee, 13))
-    assert_equal(4, testAttackee.hitpoints)
+    assert_equal(4, testAttackee.hitpoints_remaining)
     assert_equal("Miss", testAttacker.attack(testAttackee, 12))
   end
 
-  def test_character_with_weakest_strenth_has_minus_5_attack_roll_and_damage
+  def test_character_with_weakest_strenth_has_minus_5_attack_roll_and_attack_damage_is_still_1
     testAttacker = Character.with_strength("Bob", "Good", 1)
     testAttackee = Character.new("Ron", "Neutral")
     assert_equal(-5, testAttacker.strength_modifier)
     assert_equal("Hit", testAttacker.attack(testAttackee, 15))
-    assert_equal(4, testAttackee.hitpoints)
+    assert_equal(4, testAttackee.hitpoints_remaining)
     assert_equal("Miss", testAttacker.attack(testAttackee, 14))
   end
 
   def test_character_with_max_strenth_has_plus_5_attack_roll_and_damage
     testAttacker = Character.with_strength("Bob", "Good", 20)
-    testAttackee = Character.new("Ron", "Neutral", 10)
+    testAttackee = Character.new("Ron", "Neutral")
     assert_equal(5, testAttacker.strength_modifier)
     assert_equal("Hit", testAttacker.attack(testAttackee, 5))
-    assert_equal(4, testAttackee.hitpoints)
+    assert_equal(0, testAttackee.hitpoints_remaining)
     assert_equal("Miss", testAttacker.attack(testAttackee, 4))
   end
 

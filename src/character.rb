@@ -1,10 +1,11 @@
 class Character
     attr_accessor :name
     attr_accessor :armor
-    attr_accessor :hitpoints
     attr_accessor :strength_modifier
     attr_accessor :armor_modifier
     attr_accessor :hitpoints_modifier
+    attr_accessor :experience
+    attr_accessor :hitpoints_remaining
 
     def self.with_strength(name, alignment, strength)
         new(name, alignment, 5, strength)
@@ -17,8 +18,12 @@ class Character
     def self.with_constitution(name, alignment, constitution)
         new(name, alignment, 5, 10, 10, constitution)
     end
+
+    def self.with_experience(name, alignment, experience)
+        new(name, alignment, 5, 10, 10, 10, 10, 10, 10, experience)
+    end
     
-    def initialize(name, alignment, hitpoints = 5, strength = 10, dexterity = 10, constitution = 10, wisdom = 10, intelligence = 10, charisma = 10) 
+    def initialize(name, alignment, hitpoints = 5, strength = 10, dexterity = 10, constitution = 10, wisdom = 10, intelligence = 10, charisma = 10, experience = 0) 
         @name = name
         @alignment = alignment
         @strength = strength
@@ -31,40 +36,51 @@ class Character
         @armor_modifier = (@dexterity - 10)/2
         @armor = 10 + @armor_modifier
         @hitpoints_modifier = (@constitution - 10)/2
-        @hitpoints = hitpoints + @hitpoints_modifier
-        if @hitpoints < 1 
-            @hitpoints = 1
-        end
+        @experience = experience
+        @hitpoints_remaining = self.hitpoints
     end
     def describe_character
         puts "Hi, I am #{@name}, a character with #{@alignment} alignment. I have #{@armor} armor and #{@hitpoints} hit points."
     end
     def attack(character, natural_roll)
         puts "You are attacking #{character.name}."
-        roll = natural_roll + @strength_modifier
+        roll = natural_roll + @strength_modifier + (self.level / 2)
         if natural_roll == 20
             attack_damage = 2
-            if attack_damage > character.hitpoints
-                attack_damage = character.hitpoints
+            if attack_damage > character.hitpoints_remaining
+                attack_damage = character.hitpoints_remaining
             end
-            character.hitpoints = character.hitpoints - attack_damage
+            character.hitpoints_remaining = character.hitpoints_remaining - attack_damage
+            @experience  = @experience + 10
             return "Critical Hit"
         elsif roll >= character.armor
             attack_damage = 1 + @strength_modifier
             if attack_damage < 1
                 attack_damage = 1
             end
-            if attack_damage > character.hitpoints
-                attack_damage = character.hitpoints
+            if attack_damage > character.hitpoints_remaining
+                attack_damage = character.hitpoints_remaining
             end
-            character.hitpoints = character.hitpoints - attack_damage
+            character.hitpoints_remaining = character.hitpoints_remaining - attack_damage
+            @experience  = @experience + 10
             return "Hit"
         else
             return "Miss"
         end
     end
     def isDead
-        return @hitpoints == 0
+        return @hitpoints_remaining == 0
+    end
+    def level
+        return 1 + (@experience / 1000)
+    end
+    def hitpoints
+        hitpoints = (5 * self.level) + @hitpoints_modifier
+        if hitpoints < 1 
+            hitpoints = 1
+        end
+
+        return hitpoints
     end
 end
 
