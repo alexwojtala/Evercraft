@@ -45,4 +45,17 @@ class TestCharacter < Test::Unit::TestCase
     assert_equal("Hit", level_10_character.attack(character_to_attack, 5))
   end
 
+  def test_character_will_level_up_when_passing_experience_threshold_after_an_attack
+    level_1_character = Character.with_experience("Bob", "Good", 990)
+    character_to_attack = Character.new("Evil Bob", "Evil")
+
+    assert_equal(1, level_1_character.level)
+    assert_equal(5, level_1_character.hitpoints)
+    assert_equal(5, level_1_character.hitpoints_remaining)
+    level_1_character.attack(character_to_attack, 10)
+    assert_equal(2, level_1_character.level)
+    assert_equal(10, level_1_character.hitpoints)
+    assert_equal(10, level_1_character.hitpoints_remaining)
+  end
+
 end

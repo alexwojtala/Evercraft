@@ -6,6 +6,7 @@ class Character
     attr_accessor :hitpoints_modifier
     attr_accessor :experience
     attr_accessor :hitpoints_remaining
+    attr_accessor :level
 
     def self.with_strength(name, alignment, strength)
         new(name, alignment, 5, strength)
@@ -37,6 +38,7 @@ class Character
         @armor = 10 + @armor_modifier
         @hitpoints_modifier = (@constitution - 10)/2
         @experience = experience
+        @level = self.calculated_level
         @hitpoints_remaining = self.hitpoints
     end
     def describe_character
@@ -44,7 +46,7 @@ class Character
     end
     def attack(character, natural_roll)
         puts "You are attacking #{character.name}."
-        roll = natural_roll + @strength_modifier + (self.level / 2)
+        roll = natural_roll + @strength_modifier + (@level / 2)
         if natural_roll == 20
             attack_damage = 2
             if attack_damage > character.hitpoints_remaining
@@ -62,7 +64,14 @@ class Character
                 attack_damage = character.hitpoints_remaining
             end
             character.hitpoints_remaining = character.hitpoints_remaining - attack_damage
-            @experience  = @experience + 10
+            @experience = @experience + 10
+
+            if(self.calculated_level > @level) 
+                @level = calculated_level
+                @hitpoints_remaining = @hitpoints_remaining + 5
+                puts "Congratulations! #{@name} is now level #{@level}"
+            end
+
             return "Hit"
         else
             return "Miss"
@@ -71,11 +80,11 @@ class Character
     def isDead
         return @hitpoints_remaining == 0
     end
-    def level
+    def calculated_level
         return 1 + (@experience / 1000)
     end
     def hitpoints
-        hitpoints = (5 * self.level) + @hitpoints_modifier
+        hitpoints = (5 * @level) + @hitpoints_modifier
         if hitpoints < 1 
             hitpoints = 1
         end
