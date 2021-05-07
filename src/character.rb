@@ -42,7 +42,7 @@ class Character
         @hitpoints_remaining = self.hitpoints
     end
     def describe_character
-        puts "Hi, I am #{@name}, a character with #{@alignment} alignment. I have #{@armor} armor and #{@hitpoints} hit points."
+        puts "Hi, I am #{@name}, a character with #{@alignment} alignment. I have #{@armor} armor and #{self.hitpoints} hit points."
     end
     def attack(character, natural_roll)
         puts "You are attacking #{character.name}."
@@ -124,7 +124,7 @@ if __FILE__ == $0
         puts "What will you do?"
         action = gets.strip
 
-        if action == "attack"
+        if action == "attack" || action == "a"
             puts "What is your roll?" 
             roll = gets.strip.to_i
             puts protagonist.attack(antagonist, roll)
