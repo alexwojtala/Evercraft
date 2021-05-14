@@ -1,4 +1,4 @@
-require_relative "../src/character"
+require_relative "../lib/character"
 require "test/unit"
  
 class TestCharacter < Test::Unit::TestCase
