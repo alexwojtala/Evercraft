@@ -1,6 +1,10 @@
 class Character
     attr_accessor :name, :armor, :strength_modifier, :armor_modifier, :hitpoints_modifier, :experience, :hitpoints_remaining, :level
-    
+
+    def self.create_character(name, alignment)
+        new(name: name, alignment: alignment, hitpoints: 5, strength: 10, dexterity: 10, constitution: 10, wisdom: 10, intelligence: 10, charisma: 10, experience: 0)
+    end
+
     def initialize(name:, alignment:, hitpoints:, strength:, dexterity:, constitution:, wisdom:, intelligence:, charisma:, experience:)
         @name = name
         @alignment = alignment
@@ -16,7 +20,7 @@ class Character
         @hitpoints_modifier = (@constitution - 10)/2
         @experience = experience
         @level = self.calculated_level
-        @hitpoints_remaining = self.hitpoints
+        @hitpoints_remaining = hitpoints + @hitpoints_modifier
     end
     def describe_character
         puts "Hi, I am #{@name}, a character with #{@alignment} alignment. I have #{@armor} armor and #{self.hitpoints} hit points."
