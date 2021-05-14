@@ -64,6 +64,31 @@ RSpec.describe "characters" do
     expect(test_attacker.experience).to eq 0
   end
 
+  it "attack roll is increased by 1 for every even numbered level achieved" do
+    level_2_character = character(experience: 1000)
+    level_4_character = character(experience: 3031)
+    level_10_character = character(experience: 9817)
+
+
+    expect(level_2_character.attack(test_attackee, 8)).to eq "Miss"
+    expect(level_2_character.attack(test_attackee, 9)).to eq "Hit"
+    expect(level_4_character.attack(test_attackee, 7)).to eq "Miss"
+    expect(level_4_character.attack(test_attackee, 8)).to eq "Hit"
+    expect(level_10_character.attack(test_attackee, 4)).to eq "Miss"
+    expect(level_10_character.attack(test_attackee, 5)).to eq "Hit"
+  end
+
+  it "gain a level for each 1000 experience gained" do
+    level_2_character = character(experience: 1000)
+    level_3_character = character(experience: 2031)
+    level_10_character = character(experience: 9817)
+    level_11_character = character(experience: 10000)
+    expect(level_2_character.level).to eq 2
+    expect(level_3_character.level).to eq 3
+    expect(level_10_character.level).to eq 10
+    expect(level_11_character.level).to eq 11
+  end
+
   context "when passing experience threshold after an attack" do
     it "level will increase by 1" do
       level_1_character = character(experience: 990)
@@ -72,14 +97,14 @@ RSpec.describe "characters" do
       level_1_character.attack(test_attackee, 10)
       expect(level_1_character.level).to eq 2
     end
-    it "hitpoints will increase" do
+    it "hitpoints will increase by 5" do
       level_1_character = character(experience: 990)
 
       expect(level_1_character.hitpoints).to eq 5
       level_1_character.attack(test_attackee, 10)
       expect(level_1_character.hitpoints).to eq 10
     end
-    it "hitpoints_remaining will increase" do
+    it "hitpoints_remaining will increase by 5" do
       level_1_character = character(experience: 990)
 
       expect(level_1_character.hitpoints_remaining).to eq 5
@@ -88,7 +113,7 @@ RSpec.describe "characters" do
     end
   end
 
-  describe "with base levels" do
+  context "with base levels" do
     it "hit with a roll of 10 or above" do
       expect(test_attacker.attack(test_attackee, 10)).to eq "Hit"
     end
@@ -111,6 +136,19 @@ RSpec.describe "characters" do
       expect(test_attackee.hitpoints_remaining).to eq 5
       test_attacker.attack(test_attackee, 20)
       expect(test_attackee.hitpoints_remaining).to eq 3
+    end
+  end
+  context "with constitution modifier" do
+    it "will increase hitpoints by 5 plus constitution modifier when leveling up" do
+      level_1_character_with_max_constitution = character(experience: 990, constitution: 20)
+
+      expect(level_1_character_with_max_constitution.level).to eq 1
+      expect(level_1_character_with_max_constitution.hitpoints).to eq 10
+      expect(level_1_character_with_max_constitution.hitpoints_remaining).to eq 10
+      level_1_character_with_max_constitution.attack(test_attackee, 10)
+      expect(level_1_character_with_max_constitution.level).to eq 2
+      expect(level_1_character_with_max_constitution.hitpoints).to eq 20
+      expect(level_1_character_with_max_constitution.hitpoints_remaining).to eq 20
     end
   end
 end
