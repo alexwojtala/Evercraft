@@ -1,4 +1,4 @@
-require_relative 'character'
+require_relative '../src/character'
 require 'test/unit'
 require_relative 'tc_feature_character_can_attack'
 require_relative 'tc_feature_character_can_be_damaged'

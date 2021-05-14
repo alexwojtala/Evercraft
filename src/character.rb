@@ -1,12 +1,5 @@
 class Character
-    attr_accessor :name
-    attr_accessor :armor
-    attr_accessor :strength_modifier
-    attr_accessor :armor_modifier
-    attr_accessor :hitpoints_modifier
-    attr_accessor :experience
-    attr_accessor :hitpoints_remaining
-    attr_accessor :level
+    attr_accessor :name, :armor, :strength_modifier, :armor_modifier, :hitpoints_modifier, :experience, :hitpoints_remaining, :level
 
     def self.with_strength(name, alignment, strength)
         new(name, alignment, 5, strength)
@@ -22,6 +15,10 @@ class Character
 
     def self.with_experience(name, alignment, experience)
         new(name, alignment, 5, 10, 10, 10, 10, 10, 10, experience)
+    end
+
+    def self.with_experience_and_constitution(name, alignment, experience, constitution)
+        new(name, alignment, 5, 10, 10, constitution, 10, 10, 10, experience)
     end
     
     def initialize(name, alignment, hitpoints = 5, strength = 10, dexterity = 10, constitution = 10, wisdom = 10, intelligence = 10, charisma = 10, experience = 0) 
@@ -54,7 +51,7 @@ class Character
             end
             character.hitpoints_remaining = character.hitpoints_remaining - attack_damage
             @experience  = @experience + 10
-            return "Critical Hit"
+            "Critical Hit"
         elsif roll >= character.armor
             attack_damage = 1 + @strength_modifier
             if attack_damage < 1
@@ -66,30 +63,30 @@ class Character
             character.hitpoints_remaining = character.hitpoints_remaining - attack_damage
             @experience = @experience + 10
 
-            if(self.calculated_level > @level) 
+            if self.calculated_level > @level
                 @level = calculated_level
-                @hitpoints_remaining = @hitpoints_remaining + 5
+                @hitpoints_remaining = @hitpoints_remaining + 5 + @hitpoints_modifier
                 puts "Congratulations! #{@name} is now level #{@level}"
             end
 
-            return "Hit"
+            "Hit"
         else
-            return "Miss"
+            "Miss"
         end
     end
     def isDead
-        return @hitpoints_remaining == 0
+        @hitpoints_remaining == 0
     end
     def calculated_level
-        return 1 + (@experience / 1000)
+        1 + (@experience / 1000)
     end
     def hitpoints
-        hitpoints = (5 * @level) + @hitpoints_modifier
+        hitpoints = (5 + @hitpoints_modifier) * @level
         if hitpoints < 1 
             hitpoints = 1
         end
 
-        return hitpoints
+        hitpoints
     end
 end
 
@@ -112,7 +109,7 @@ if __FILE__ == $0
             alignment = "Neutral"
         end
 
-        return Character.new(name, alignment)
+        Character.new(name, alignment)
     end
 
     protagonist = set_character_name

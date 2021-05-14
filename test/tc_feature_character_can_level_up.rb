@@ -1,4 +1,4 @@
-require_relative "character"
+require_relative "../src/character"
 require "test/unit"
  
 class TestCharacter < Test::Unit::TestCase
@@ -56,6 +56,19 @@ class TestCharacter < Test::Unit::TestCase
     assert_equal(2, level_1_character.level)
     assert_equal(10, level_1_character.hitpoints)
     assert_equal(10, level_1_character.hitpoints_remaining)
+  end
+
+  def test_character_will_incease_hitpoints_by_5_plus_constitution_modifier
+    level_1_character_with_max_constitution = Character.with_experience_and_constitution("Bob", "Good", 990, 20)
+    character_to_attack = Character.new("Evil Bob", "Evil")
+
+    assert_equal(1, level_1_character_with_max_constitution.level)
+    assert_equal(10, level_1_character_with_max_constitution.hitpoints)
+    assert_equal(10, level_1_character_with_max_constitution.hitpoints_remaining)
+    level_1_character_with_max_constitution.attack(character_to_attack, 10)
+    assert_equal(2, level_1_character_with_max_constitution.level)
+    assert_equal(20, level_1_character_with_max_constitution.hitpoints)
+    assert_equal(20, level_1_character_with_max_constitution.hitpoints_remaining)
   end
 
 end
