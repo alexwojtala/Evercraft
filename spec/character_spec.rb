@@ -138,6 +138,7 @@ RSpec.describe "characters" do
       expect(test_attackee.hitpoints_remaining).to eq 3
     end
   end
+
   context "with constitution modifier" do
     it "will increase hitpoints by 5 plus constitution modifier when leveling up" do
       level_1_character_with_max_constitution = character(experience: 990, constitution: 20)
@@ -149,6 +150,96 @@ RSpec.describe "characters" do
       expect(level_1_character_with_max_constitution.level).to eq 2
       expect(level_1_character_with_max_constitution.hitpoints).to eq 20
       expect(level_1_character_with_max_constitution.hitpoints_remaining).to eq 20
+    end
+  end
+
+  context "with strength modifier" do
+    it "of 12 will increase roll and attack damage by 1" do
+      level_1_character_with_12_strength = character(strength: 12)
+
+      expect(level_1_character_with_12_strength.strength_modifier).to eq 1
+      expect(level_1_character_with_12_strength.attack(test_attackee, 9)).to eq "Hit"
+      expect(test_attackee.hitpoints_remaining).to eq 3
+      expect(level_1_character_with_12_strength.attack(test_attackee, 8)).to eq "Miss"
+
+    end
+
+    it "of 15 will increase roll and attack damage by 2" do
+      level_1_character_with_15_strength = character(strength: 15)
+
+      expect(level_1_character_with_15_strength.strength_modifier).to eq 2
+      expect(level_1_character_with_15_strength.attack(test_attackee, 8)).to eq "Hit"
+      expect(test_attackee.hitpoints_remaining).to eq 2
+      expect(level_1_character_with_15_strength.attack(test_attackee, 7)).to eq "Miss"
+
+    end
+
+    it "of 8 will decrease roll by 1 and attack damage will remain at 1" do
+      level_1_character_with_8_strength = character(strength: 8)
+
+      expect(level_1_character_with_8_strength.strength_modifier).to eq -1
+      expect(level_1_character_with_8_strength.attack(test_attackee, 11)).to eq "Hit"
+      expect(test_attackee.hitpoints_remaining).to eq 4
+      expect(level_1_character_with_8_strength.attack(test_attackee, 10)).to eq "Miss"
+
+    end
+
+    it "of 5 will decrease roll by 3 and attack damage will remain at 1" do
+      level_1_character_with_5_strength = character(strength: 5)
+
+      expect(level_1_character_with_5_strength.strength_modifier).to eq -3
+      expect(level_1_character_with_5_strength.attack(test_attackee, 13)).to eq "Hit"
+      expect(test_attackee.hitpoints_remaining).to eq 4
+      expect(level_1_character_with_5_strength.attack(test_attackee, 12)).to eq "Miss"
+    end
+
+    it "with min value of 1 will decrease roll by 5 and attack damage will remain at 1" do
+      level_1_character_with_minimum_strength = character(strength: 1)
+
+      expect(level_1_character_with_minimum_strength.strength_modifier).to eq -5
+      expect(level_1_character_with_minimum_strength.attack(test_attackee, 15)).to eq "Hit"
+      expect(test_attackee.hitpoints_remaining).to eq 4
+      expect(level_1_character_with_minimum_strength.attack(test_attackee, 14)).to eq "Miss"
+    end
+
+    it "with max value of 20 will increase roll and attack damage  by 5" do
+      level_1_character_with_maximum_strength = character(strength: 20)
+
+      expect(level_1_character_with_maximum_strength.strength_modifier).to eq 5
+      expect(level_1_character_with_maximum_strength.attack(test_attackee, 5)).to eq "Hit"
+      expect(test_attackee.hitpoints_remaining).to eq 0
+      expect(level_1_character_with_maximum_strength.attack(test_attackee, 4)).to eq "Miss"
+    end
+  end
+
+  context 'with dexterity' do
+    it 'of 10 is defaulted to 10 armor with an armor modifier of 0' do
+      expect(Character.create_character("Jim", "Neutral").armor_modifier).to eq 0
+      expect(Character.create_character("Jim", "Neutral").armor).to eq 10
+    end
+
+    it 'greater than 10, has positive armor modifier and armor greater than 10' do
+      character_with_above_base_dexterity = character(dexterity: 12)
+      expect(character_with_above_base_dexterity.armor_modifier).to be > 0
+      expect(character_with_above_base_dexterity.armor).to be > 10
+    end
+
+    it 'less than 10, has negative armor modifier and armor less than 10' do
+      character_with_below_base_dexterity = character(dexterity: 8)
+      expect(character_with_below_base_dexterity.armor_modifier).to be < 0
+      expect(character_with_below_base_dexterity.armor).to be < 10
+    end
+
+    it 'should modify armor rating' do
+      expectedArmorRatingModifiers = [-5, -4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5]
+      expectedArmorRatings = [5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15]
+      dexterityRatings = (1..20).to_a
+
+      dexterityRatings.each_with_index do |dexterity, index|
+        testCharacter = character(dexterity: dexterity)
+        expect(testCharacter.armor_modifier).to eq expectedArmorRatingModifiers[index]
+        expect(testCharacter.armor).to eq expectedArmorRatings[index]
+      end
     end
   end
 end
