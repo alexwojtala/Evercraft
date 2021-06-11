@@ -92,23 +92,28 @@ if __FILE__ == $0
             alignment = "Neutral"
         end
 
-        Character.new(name, alignment)
+        Character.create_character(name, alignment)
     end
 
     protagonist = set_character_name
     protagonist.describe_character
 
-    antagonist = Character.new("#{protagonist.name}'s Evil twin", "Evil")
+    antagonist = Character.create_character("#{protagonist.name}'s Evil twin", "Evil")
     loop do
             
         puts "What will you do?"
         action = gets.strip
 
         if action == "attack" || action == "a"
-            puts "What is your roll?" 
+          if antagonist.isDead
+              puts "#{antagonist.name} is dead. There is nothing else to do."
+          else
+            puts "What is your roll?"
             roll = gets.strip.to_i
             puts "You are attacking #{antagonist.name}."
             puts protagonist.attack(antagonist, roll)
+            puts "#{antagonist.name} has #{antagonist.hitpoints_remaining} health remaining."
+          end
         end
 
         if action == "quit"
