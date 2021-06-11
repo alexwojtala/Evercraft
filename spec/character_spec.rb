@@ -26,9 +26,16 @@ RSpec.describe "characters" do
     @test_attackee ||= character(name: "Ron", alignment: "Evil")
   end
 
+  expectedRatingModifiers = [-5, -4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5]
+  ratingsRange = (1..20).to_a
+
   it "start at level 1" do
     cool_joe = Character.create_character("Cool Joe", " Good")
     expect(cool_joe.level).to eq 1
+  end
+
+  it "have default hitpoints modifier of zero" do
+    expect(Character.create_character("Steve", "Neutral").hitpoints_modifier).to eq 0
   end
 
   it "are dead if zero hitpoints remain" do
@@ -140,6 +147,26 @@ RSpec.describe "characters" do
   end
 
   context "with constitution modifier" do
+    it "of less than 10 will have a negative hitpoints modifier and less than the base hitpoints" do
+      expect(character(constitution: 8).hitpoints_modifier).to be < 0
+      expect(character(constitution: 8).hitpoints).to be < 5
+    end
+
+    it "of greater than 11 will have a positive hitpoints modifier and more than the base hitpoints" do
+      expect(character(constitution: 12).hitpoints_modifier).to be > 0
+      expect(character(constitution: 12).hitpoints).to be > 5
+    end
+
+    it 'should modify hitpoints' do
+      expectedHitpointRatings = [1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10]
+
+      ratingsRange.each_with_index do |constitution, index|
+        testCharacter = character(constitution: constitution)
+        expect(testCharacter.hitpoints_modifier).to eq expectedRatingModifiers[index]
+        expect(testCharacter.hitpoints).to eq expectedHitpointRatings[index]
+      end
+    end
+
     it "will increase hitpoints by 5 plus constitution modifier when leveling up" do
       level_1_character_with_max_constitution = character(experience: 990, constitution: 20)
 
@@ -218,7 +245,7 @@ RSpec.describe "characters" do
       expect(Character.create_character("Jim", "Neutral").armor).to eq 10
     end
 
-    it 'greater than 10, has positive armor modifier and armor greater than 10' do
+    it 'greater than 11, has positive armor modifier and armor greater than 10' do
       character_with_above_base_dexterity = character(dexterity: 12)
       expect(character_with_above_base_dexterity.armor_modifier).to be > 0
       expect(character_with_above_base_dexterity.armor).to be > 10
@@ -231,13 +258,11 @@ RSpec.describe "characters" do
     end
 
     it 'should modify armor rating' do
-      expectedArmorRatingModifiers = [-5, -4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5]
       expectedArmorRatings = [5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15]
-      dexterityRatings = (1..20).to_a
 
-      dexterityRatings.each_with_index do |dexterity, index|
+      ratingsRange.each_with_index do |dexterity, index|
         testCharacter = character(dexterity: dexterity)
-        expect(testCharacter.armor_modifier).to eq expectedArmorRatingModifiers[index]
+        expect(testCharacter.armor_modifier).to eq expectedRatingModifiers[index]
         expect(testCharacter.armor).to eq expectedArmorRatings[index]
       end
     end
