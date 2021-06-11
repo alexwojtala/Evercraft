@@ -1,27 +1,11 @@
 class Character
     attr_accessor :name, :armor, :strength_modifier, :armor_modifier, :hitpoints_modifier, :experience, :hitpoints_remaining, :level
 
-    def self.with_strength(name, alignment, strength)
-        new(name, alignment, 5, strength)
+    def self.create_character(name, alignment)
+        new(name: name, alignment: alignment, hitpoints: 5, strength: 10, dexterity: 10, constitution: 10, wisdom: 10, intelligence: 10, charisma: 10, experience: 0)
     end
 
-    def self.with_dexterity(name, alignment, dexterity)
-        new(name, alignment, 5, 10, dexterity)
-    end
-
-    def self.with_constitution(name, alignment, constitution)
-        new(name, alignment, 5, 10, 10, constitution)
-    end
-
-    def self.with_experience(name, alignment, experience)
-        new(name, alignment, 5, 10, 10, 10, 10, 10, 10, experience)
-    end
-
-    def self.with_experience_and_constitution(name, alignment, experience, constitution)
-        new(name, alignment, 5, 10, 10, constitution, 10, 10, 10, experience)
-    end
-    
-    def initialize(name, alignment, hitpoints = 5, strength = 10, dexterity = 10, constitution = 10, wisdom = 10, intelligence = 10, charisma = 10, experience = 0) 
+    def initialize(name:, alignment:, hitpoints:, strength:, dexterity:, constitution:, wisdom:, intelligence:, charisma:, experience:)
         @name = name
         @alignment = alignment
         @strength = strength
@@ -36,13 +20,12 @@ class Character
         @hitpoints_modifier = (@constitution - 10)/2
         @experience = experience
         @level = self.calculated_level
-        @hitpoints_remaining = self.hitpoints
+        @hitpoints_remaining = hitpoints + @hitpoints_modifier
     end
     def describe_character
         puts "Hi, I am #{@name}, a character with #{@alignment} alignment. I have #{@armor} armor and #{self.hitpoints} hit points."
     end
     def attack(character, natural_roll)
-        puts "You are attacking #{character.name}."
         roll = natural_roll + @strength_modifier + (@level / 2)
         if natural_roll == 20
             attack_damage = 2
@@ -109,22 +92,28 @@ if __FILE__ == $0
             alignment = "Neutral"
         end
 
-        Character.new(name, alignment)
+        Character.create_character(name, alignment)
     end
 
     protagonist = set_character_name
     protagonist.describe_character
 
-    antagonist = Character.new("#{protagonist.name}'s Evil twin", "Evil")
+    antagonist = Character.create_character("#{protagonist.name}'s Evil twin", "Evil")
     loop do
             
         puts "What will you do?"
         action = gets.strip
 
         if action == "attack" || action == "a"
-            puts "What is your roll?" 
+          if antagonist.isDead
+              puts "#{antagonist.name} is dead. There is nothing else to do."
+          else
+            puts "What is your roll?"
             roll = gets.strip.to_i
+            puts "You are attacking #{antagonist.name}."
             puts protagonist.attack(antagonist, roll)
+            puts "#{antagonist.name} has #{antagonist.hitpoints_remaining} health remaining."
+          end
         end
 
         if action == "quit"
